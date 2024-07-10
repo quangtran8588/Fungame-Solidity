@@ -173,12 +173,12 @@ contract Fungame is Ownable {
         if (games[gameId].endPrice != 0) revert AlreadySet();
 
         //  - If `gameId = 0` (initial setting)
-        //  Operator is allowed to set `endPrice` one minute before `START_TIME`
+        //  Operator is allowed to set `endPrice` before `START_TIME`
         //  - If `gameId != 0`
         //  Operator is only allowed to set `endPrice` after the end of a game
         uint256 currentTime = block.timestamp;
         if (
-            (gameId == 0 && currentTime + 60 < START_TIME) ||
+            (gameId == 0 && currentTime < START_TIME) ||
             (gameId != 0 &&
                 currentTime < START_TIME + gameId * settings.windowTime)
         ) revert TooEarly();
