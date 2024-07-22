@@ -14,13 +14,13 @@ async function main() {
   //  Deploy Fungame contract
   console.log("\nDeploy Fungame Contract .........");
   const initialOwner = Deployer.address;
-  const startTime = 1720758600;
-  const Points = "0x60F152d9aA873f58aC8dba88134DCCabb760f413";
+  const startTime = 1721116500; // replace by your starting time
+  const Points = "";
   const initSettings = {
     freeGuessPerDay: 3,
     fixedReward: 20,
     windowTime: 3600, //  1 hour per game
-    lockoutTime: 900, //  15mins lockout
+    lockoutTime: 900, //  15 minutes lockout time
   };
 
   const Fungame = (await ethers.getContractFactory(
@@ -37,6 +37,19 @@ async function main() {
   await fungame.deploymentTransaction()?.wait();
 
   console.log("Fungame Contract: ", await fungame.getAddress());
+
+  //  Set Deployed as Operator contract
+  console.log("\nSet Operator of Fun Game contract .........");
+  let tx = await fungame.setOperator(await Deployer.getAddress(), true);
+  console.log("Tx Hash: ", tx.hash);
+  await tx.wait();
+
+  //  Set Deployed as Operator contract
+  console.log("\nSet Operator of Points contract .........");
+  const points = await ethers.getContractAt("Points", Points, Deployer);
+  tx = await points.setOperator(await fungame.getAddress(), true);
+  console.log("Tx Hash: ", tx.hash);
+  await tx.wait();
 
   console.log("\n===== DONE =====");
 }

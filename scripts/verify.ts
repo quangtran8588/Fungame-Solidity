@@ -13,8 +13,8 @@ async function main() {
   });
 
   console.log("Verify Fungame Contract ......");
-  const Fungame = "0x18eE9DADFa56848B5bA82EaafC848B3746de9D34";
-  const startTime = 1720758600;
+  const Fungame = "0xDf5320d72285033beda9c587CffC248aE00a2f43";
+  const startTime = 1721016000;
   const initSettings = {
     freeGuessPerDay: 3,
     fixedReward: 20,

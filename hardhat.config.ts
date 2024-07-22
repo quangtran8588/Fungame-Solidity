@@ -9,15 +9,6 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   networks: {
-    arb_test: {
-      url: process.env.ARB_TESTNET_RPC || "",
-      accounts:
-        process.env.TESTNET_DEPLOYER !== undefined
-          ? [process.env.TESTNET_DEPLOYER]
-          : [],
-      timeout: 900000,
-      chainId: 421614,
-    },
     base_test: {
       url: process.env.BASE_TESTNET_RPC || "",
       accounts:

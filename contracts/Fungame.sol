@@ -193,7 +193,7 @@ contract Fungame is Ownable {
         @dev
         - Requirements:
             - Caller can be ANY
-            - Players can place their guess at a `currentGame` or a next game.
+            - Players can place their guess at a `currentGame` or next two games.
             - During lockout time, Players are not able to place their guess.
             - Players can place their guess one time per game.
         - Params:
@@ -203,14 +203,15 @@ contract Fungame is Ownable {
     */
     function guess(uint256 gameId, uint256 value, Option option) external {
         ///  Validate guessing request:
-        ///  - Players are allowed to place their guess on the `currentGame` or the next one
+        ///  - Players are allowed to place their guess on the `currentGame` or the next two ones
         ///  - If `currentGame`: players only place their guess before `lockoutTime`
         ///  - Only two guessing options: UP or DOWN
         uint256 currentGameId = currentGame;
         Setting memory currentSettings = settings;
         address sender = msg.sender;
         uint256 currentTime = block.timestamp;
-        if (gameId != currentGameId && gameId != currentGameId + 1)
+        if (currentTime < START_TIME) revert TooEarly();
+        if (gameId != currentGameId && gameId > currentGameId + 2)
             revert GameUnavailable();
         if (
             gameId == currentGameId &&
@@ -290,5 +291,34 @@ contract Fungame is Ownable {
         Points.increase(sender, reward);
 
         emit Claimed(sender, gameId, reward);
+    }
+
+    /** 
+        @notice Check winning status of the `account` for the `gameId`
+        @dev
+        - Requirements:
+            - Caller can be ANY
+            - `gameId` must be non-zero
+            - Game must already be finalized by Operator
+        - Params:
+            - account           Account's address that needs to check winning status
+            - gameId            The unique game number
+    */
+    function checkWinning(
+        address account,
+        uint256 gameId
+    ) external view returns (bool) {
+        if (gameId == 0 || games[gameId].endPrice == 0) return false;
+
+        uint256 startPrice = games[gameId].startPrice;
+        uint256 endPrice = games[gameId].endPrice;
+        Option guessOption = guesses[account][gameId].option;
+
+        if (
+            (endPrice > startPrice && guessOption == Option.UP) ||
+            (endPrice < startPrice && guessOption == Option.DOWN)
+        ) return true;
+
+        return false;
     }
 }
